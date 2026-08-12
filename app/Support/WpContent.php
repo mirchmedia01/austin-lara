@@ -21,20 +21,20 @@ class WpContent
 
     /** @var array<int, string> WordPress object id => Laravel route */
     private array $pageRoutes = [
-        40    => '/about-us',
-        42    => '/meet-the-team',
-        44    => '/awards',
-        51    => '/contact-lens-exams',
-        53    => '/eye-vision-exams',
-        55    => '/hard-to-fit-contact',
-        57    => '/sunglasses',
-        59    => '/computer-vision',
-        61    => '/lenses',
-        99    => '/insurances',
-        101   => '/frame-selection',
-        103   => '/best-of-boro',
-        105   => '/blog',
-        107   => '/contact-us',
+        40 => '/about-us',
+        42 => '/meet-the-team',
+        44 => '/awards',
+        51 => '/contact-lens-exams',
+        53 => '/eye-vision-exams',
+        55 => '/hard-to-fit-contact',
+        57 => '/sunglasses',
+        59 => '/computer-vision',
+        61 => '/lenses',
+        99 => '/insurances',
+        101 => '/frame-selection',
+        103 => '/best-of-boro',
+        105 => '/blog',
+        107 => '/contact-us',
         12529 => '/services',
         13006 => '/',
         // blog posts
@@ -74,7 +74,7 @@ class WpContent
 
     public static function instance(): self
     {
-        return self::$instance ??= new self();
+        return self::$instance ??= new self;
     }
 
     public function head(string $page, ?string $seoTitle = null, ?string $seoDescription = null, ?string $ogImage = null): string
@@ -134,6 +134,97 @@ class WpContent
     }
 
     /**
+     * Split the static blog listing into the fragments that surround the post
+     * grid so the Blade view can render every repository post card inside the
+     * original Elementor posts widget.
+     *
+     * The captured page contains a second, duplicate posts widget that repeats
+     * the first six entries; it is dropped so no post is ever shown twice.
+     *
+     * @return array{before: string, after: string}
+     */
+    public function blogMainParts(): array
+    {
+        $html = $this->rewrite($this->extract($this->source('blog'), '<main', '</main>'));
+
+        $widget = strpos($html, '<div class="elementor-element elementor-element-7158036');
+        if ($widget === false) {
+            throw new RuntimeException('Cannot locate blog posts widget in source.');
+        }
+
+        $grid = strpos($html, '<div class="elementor-posts-container', $widget);
+        if ($grid === false) {
+            throw new RuntimeException('Cannot locate blog posts grid in source.');
+        }
+
+        $before = substr($html, 0, strpos($html, '>', $grid) + 1);
+
+        // Include the grid's own closing tag (the position just after it would
+        // discard it, leaving the container unclosed).
+        $gridClose = $this->divEnd($html, $grid) - strlen('</div>');
+
+        $duplicate = strpos($html, '<div class="elementor-element elementor-element-1b4f467');
+
+        $after = $duplicate === false
+            ? substr($html, $gridClose)
+            : substr($html, $gridClose, $duplicate - $gridClose).substr($html, $this->divEnd($html, $duplicate));
+
+        return ['before' => $before, 'after' => $after];
+    }
+
+    /**
+     * Return the position just after the </div> that closes the <div> whose
+     * opening tag starts at $openPos, honouring nested div elements.
+     */
+    private function divEnd(string $html, int $openPos): int
+    {
+        $length = strlen($html);
+        $pos = strpos($html, '>', $openPos);
+        if ($pos === false) {
+            throw new RuntimeException('Malformed opening <div> tag in source.');
+        }
+
+        $pos++;
+        $depth = 1;
+
+        while ($pos < $length) {
+            $open = strpos($html, '<div', $pos);
+            $close = strpos($html, '</div>', $pos);
+
+            if ($close === false) {
+                throw new RuntimeException('Unbalanced <div> tags in source.');
+            }
+
+            if ($open !== false && $open < $close) {
+                $depth++;
+                $pos = strpos($html, '>', $open);
+                if ($pos === false) {
+                    throw new RuntimeException('Malformed opening <div> tag in source.');
+                }
+                $pos++;
+            } else {
+                $depth--;
+                $pos = $close + strlen('</div>');
+
+                if ($depth === 0) {
+                    return $pos;
+                }
+            }
+        }
+
+        throw new RuntimeException('Unbalanced <div> tags in source.');
+    }
+
+    /**
+     * Resolve a repository image path (images/uploads/...) to the copied
+     * wp-content media root used by the static WordPress assets.
+     */
+    public function postImage(string $image): string
+    {
+        return str_replace('/images/uploads/', '/wp-content/uploads/', $this->toLocal($image));
+    }
+
+    /**
      * Rewrite a blog post body (stored in app/Data/Posts) to the wp-content
      * media root so image references match the copied WordPress assets.
      */
@@ -147,10 +238,10 @@ class WpContent
     private function source(string $page): string
     {
         if (! isset($this->sources[$page])) {
-            $path = resource_path('wp/' . basename($page) . '.html');
+            $path = resource_path('wp/'.basename($page).'.html');
 
             if (! is_file($path)) {
-                throw new RuntimeException('Missing WordPress page source: ' . $path);
+                throw new RuntimeException('Missing WordPress page source: '.$path);
             }
 
             $this->sources[$page] = (string) file_get_contents($path);
@@ -163,12 +254,12 @@ class WpContent
     {
         $s = strpos($html, $start);
         if ($s === false) {
-            throw new RuntimeException('Cannot find "' . $start . '" in source.');
+            throw new RuntimeException('Cannot find "'.$start.'" in source.');
         }
 
         $e = strpos($html, $end, $s + strlen($start));
         if ($e === false) {
-            throw new RuntimeException('Cannot find "' . $end . '" in source.');
+            throw new RuntimeException('Cannot find "'.$end.'" in source.');
         }
 
         return substr($html, $s, $e + strlen($end) - $s);
@@ -180,25 +271,25 @@ class WpContent
 
         $html = preg_replace_callback(
             '/(\b(?:href|src)=")([^"]*)(")/',
-            fn ($m) => $m[1] . $this->toLocal($m[2]) . $m[3],
+            fn ($m) => $m[1].$this->toLocal($m[2]).$m[3],
             $html
         );
 
         $html = preg_replace_callback(
             "/(\b(?:href|src)=')([^']*)(')/",
-            fn ($m) => $m[1] . $this->toLocal($m[2]) . $m[3],
+            fn ($m) => $m[1].$this->toLocal($m[2]).$m[3],
             $html
         );
 
         $html = preg_replace_callback(
             '/srcset="([^"]*)"/',
-            fn ($m) => 'srcset="' . $this->rewriteSrcset($m[1]) . '"',
+            fn ($m) => 'srcset="'.$this->rewriteSrcset($m[1]).'"',
             $html
         );
 
         $html = preg_replace_callback(
             '/url\((["\']?)([^"\')]+)\1\)/',
-            fn ($m) => 'url(' . $m[1] . $this->toLocalUrl($m[2]) . $m[1] . ')',
+            fn ($m) => 'url('.$m[1].$this->toLocalUrl($m[2]).$m[1].')',
             $html
         );
 
@@ -214,7 +305,7 @@ class WpContent
             }
 
             if (preg_match('/^(\S+)(\s+\d+[whx]?)(.*)$/', $candidate, $m)) {
-                return $this->toLocal($m[1]) . $m[2] . $m[3];
+                return $this->toLocal($m[1]).$m[2].$m[3];
             }
 
             return $this->toLocal($candidate);
@@ -252,13 +343,13 @@ class WpContent
         }
 
         if (preg_match('#^index\.html(\#[^/]*)?$#', $path, $m)) {
-            return '/' . ($m[1] ?? '');
+            return '/'.($m[1] ?? '');
         }
 
         if (preg_match('#^index\.html@p=(\d+)(?:\.html)?(\#[^/]*)?$#', $path, $m)) {
             $route = $this->pageRoutes[$m[1]] ?? '/';
 
-            return $route . ($m[2] ?? '');
+            return $route.($m[2] ?? '');
         }
 
         if (str_starts_with($path, 'tag/') || str_starts_with($path, 'category/')) {
@@ -266,22 +357,22 @@ class WpContent
         }
 
         if (str_starts_with($path, 'wp-')) {
-            return '/' . $path;
+            return '/'.$path;
         }
 
         if (str_starts_with($path, 'service/')) {
-            return '/' . preg_replace('#/index\.html$#', '', substr($path, strlen('service/')));
+            return '/'.preg_replace('#/index\.html$#', '', substr($path, strlen('service/')));
         }
 
         if (preg_match('#^(.*?)/index\.html$#', $path, $m)) {
-            return '/' . $m[1];
+            return '/'.$m[1];
         }
 
         if (preg_match('#^https?://#i', $path)) {
             return $path;
         }
 
-        return '/' . ltrim($path, '/');
+        return '/'.ltrim($path, '/');
     }
 
     private function toLocalUrl(string $path): string
@@ -307,14 +398,14 @@ class WpContent
         $path = preg_replace('#@[^/]*$#', '', $path);
 
         if (str_starts_with($path, 'wp-')) {
-            return '/' . $path;
+            return '/'.$path;
         }
 
         if (str_starts_with($path, '/')) {
             return $path;
         }
 
-        return '/wp-content/uploads/' . ltrim($path, '/');
+        return '/wp-content/uploads/'.ltrim($path, '/');
     }
 
     private function finalizeHead(string $head, ?string $seoTitle, ?string $seoDescription, ?string $ogImage): string
@@ -323,14 +414,14 @@ class WpContent
 
         $head = preg_replace(
             '#<link rel="canonical" href="[^"]*" ?/>#',
-            '<link rel="canonical" href="' . e($url) . '" />',
+            '<link rel="canonical" href="'.e($url).'" />',
             $head,
             1
         );
 
         $head = preg_replace(
             '#<meta property="og:url" content="[^"]*" ?/>#',
-            '<meta property="og:url" content="' . e($url) . '" />',
+            '<meta property="og:url" content="'.e($url).'" />',
             $head,
             1
         );
@@ -338,13 +429,13 @@ class WpContent
         if ($seoTitle !== null) {
             $head = preg_replace(
                 '#<title>[^<]*</title>#',
-                '<title>' . e($seoTitle) . '</title>',
+                '<title>'.e($seoTitle).'</title>',
                 $head,
                 1
             );
             $head = preg_replace(
                 '#<meta property="og:title" content="[^"]*" ?/>#',
-                '<meta property="og:title" content="' . e($seoTitle) . '" />',
+                '<meta property="og:title" content="'.e($seoTitle).'" />',
                 $head,
                 1
             );
@@ -353,13 +444,13 @@ class WpContent
         if ($seoDescription !== null) {
             $head = preg_replace(
                 '#<meta name="description" content="[^"]*" ?/>#',
-                '<meta name="description" content="' . e($seoDescription) . '" />',
+                '<meta name="description" content="'.e($seoDescription).'" />',
                 $head,
                 1
             );
             $head = preg_replace(
                 '#<meta property="og:description" content="[^"]*" ?/>#',
-                '<meta property="og:description" content="' . e($seoDescription) . '" />',
+                '<meta property="og:description" content="'.e($seoDescription).'" />',
                 $head,
                 1
             );
@@ -370,7 +461,7 @@ class WpContent
 
             $head = preg_replace(
                 '#<meta property="og:image" content="[^"]*" ?/>#',
-                '<meta property="og:image" content="' . $image . '" />',
+                '<meta property="og:image" content="'.$image.'" />',
                 $head,
                 1
             );

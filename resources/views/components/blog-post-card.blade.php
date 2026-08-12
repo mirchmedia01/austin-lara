@@ -1,25 +1,31 @@
 @props(['post' => []])
 
-<article class="blog-card">
+<article class="elementor-post elementor-grid-item post type-post status-publish format-standard has-post-thumbnail hentry" role="listitem">
     @if(isset($post['image']))
-    <div class="blog-card__image">
-        <a href="{{ route('blog.post', $post['slug']) }}" tabindex="-1" aria-hidden="true">
-            <img src="{{ asset($post['image']) }}"
+    <a class="elementor-post__thumbnail__link" href="{{ route('blog.post', $post['slug']) }}" tabindex="-1">
+        <div class="elementor-post__thumbnail">
+            <img src="{{ \App\Support\WpContent::instance()->postImage($post['image']) }}"
                  alt="{{ $post['image_alt'] ?? $post['title'] }}"
+                 class="attachment-medium size-medium"
                  loading="lazy">
-        </a>
-    </div>
+        </div>
+    </a>
     @endif
-    <div class="blog-card__body">
-        <p class="blog-card__meta">{{ $post['date'] ?? '' }}</p>
-        <h3 class="blog-card__title">
+    <div class="elementor-post__text">
+        <h3 class="elementor-post__title">
             <a href="{{ route('blog.post', $post['slug']) }}">{{ $post['title'] }}</a>
         </h3>
+        <div class="elementor-post__meta-data">
+            <span class="elementor-post-date">{{ $post['date'] ?? '' }}</span>
+            <span class="elementor-post-avatar">No Comments</span>
+        </div>
         @if(isset($post['excerpt']))
-        <p class="blog-card__excerpt">{{ $post['excerpt'] }}</p>
+        <div class="elementor-post__excerpt">
+            <p>{{ $post['excerpt'] }}</p>
+        </div>
         @endif
-        <a href="{{ route('blog.post', $post['slug']) }}" class="blog-card__read-more">
-            Read more
+        <a class="elementor-post__read-more" href="{{ route('blog.post', $post['slug']) }}">
+            Read More »
         </a>
     </div>
 </article>
