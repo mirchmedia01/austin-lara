@@ -78,12 +78,19 @@
                         </a>
                     </li>
 
+                    <li class="primary-nav__item">
+                        <a href="{{ route('contact-us') }}"
+                           class="primary-nav__link {{ request()->routeIs('contact-us') ? 'is-active' : '' }}">
+                            Contact Us
+                        </a>
+                    </li>
+
                 </ul>
             </nav>
 
             {{-- CTA button --}}
             <div class="site-header__cta" style="display:flex;align-items:center;gap:0.5rem;flex-shrink:0;">
-                <a href="{{ route('contact-us') }}" class="nav-cta-btn">Get Started</a>
+                <a href="tel:+17182618655" class="nav-cta-btn"><i class="fas fa-phone-alt" aria-hidden="true"></i> Get Started Now</a>
                 <button class="mobile-menu-toggle"
                         id="mobile-menu-toggle"
                         aria-label="Open navigation menu"

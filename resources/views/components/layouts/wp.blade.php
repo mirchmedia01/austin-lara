@@ -12,6 +12,7 @@
 <html lang="en-US">
 <head>
 {!! $head !!}
+@stack('styles')
 </head>
 <body class="{{ $bodyClass }}">
 
