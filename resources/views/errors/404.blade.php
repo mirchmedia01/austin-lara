@@ -16,7 +16,7 @@
                 </p>
                 <div class="elementor-widget-container" style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px;">
                     <a href="/" class="btn-gold-lg">Back to Home</a>
-                    <a href="/contact-us" style="display:inline-block;background:#ffffff;border:1px solid #02216A;color:#02216A;border-radius:10px;padding:13px 24px;font-family:'Inter',sans-serif;font-weight:600;font-size:1rem;text-decoration:none;">Contact Us</a>
+                    <a href="/contact-us/" style="display:inline-block;background:#ffffff;border:1px solid #02216A;color:#02216A;border-radius:10px;padding:13px 24px;font-family:'Inter',sans-serif;font-weight:600;font-size:1rem;text-decoration:none;">Contact Us</a>
                 </div>
             </div>
         </div>

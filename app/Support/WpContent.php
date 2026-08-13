@@ -21,55 +21,55 @@ class WpContent
 
     /** @var array<int, string> WordPress object id => Laravel route */
     private array $pageRoutes = [
-        40 => '/about-us',
-        42 => '/meet-the-team',
-        44 => '/awards',
-        51 => '/contact-lens-exams',
-        53 => '/eye-vision-exams',
-        55 => '/hard-to-fit-contact',
-        57 => '/sunglasses',
-        59 => '/computer-vision',
-        61 => '/lenses',
-        99 => '/insurances',
-        101 => '/frame-selection',
-        103 => '/best-of-boro',
-        105 => '/blog',
-        107 => '/contact-us',
-        12529 => '/services',
+        40 => '/about-us/',
+        42 => '/meet-the-team/',
+        44 => '/awards/',
+        51 => '/contact-lens-exams/',
+        53 => '/eye-vision-exams/',
+        55 => '/hard-to-fit-contact/',
+        57 => '/sunglasses/',
+        59 => '/computer-vision/',
+        61 => '/lenses/',
+        99 => '/insurances/',
+        101 => '/frame-selection/',
+        103 => '/best-of-boro/',
+        105 => '/blog/',
+        107 => '/contact-us/',
+        12529 => '/services/',
         13006 => '/',
         // blog posts
-        2337 => '/hyperopia-affects-near-vision',
-        2338 => '/myopia-with-atropine-eye-drop',
-        2339 => '/scleral-lenses-for-keratoconus-dry-eye',
-        2340 => '/why-do-i-need-multifocal-lenses',
-        2341 => '/9-signs-your-child-might-need-glasses',
-        2342 => '/why-your-child-needs-a-comprehensive-vision-check',
-        2343 => '/5-signs-your-eyeglass-prescription-is-wrong',
-        2344 => '/the-pros-and-cons-of-contact-lenses',
-        10237 => '/contact-lens-exam-vs-eye-exam-whats-the-difference',
-        10285 => '/cost-of-contact-lens-exams-austin-optics-guide',
-        10292 => '/your-first-contact-lens-appointment-austin-optics',
-        10296 => '/contacts-vs-glasses-exam-austin-optics',
-        10389 => '/why-you-need-an-eye-exam',
-        10394 => '/top-tips-for-digital-eye-strain-relief',
-        10400 => '/navigating-eye-care-in-nyc',
-        10403 => '/top-10-tips-for-digital-eye-strain-relief',
-        10406 => '/what-your-eyes-reveal',
-        10409 => '/why-comprehensive-pediatric-eye-exams',
-        10414 => '/beyond-digital-fatigue-a-medical-guide-to-computer-vision',
-        10419 => '/tips-to-protect-your-eyes-this-winter-austin-optics',
-        10733 => '/why-a-contact-lens-exam-is-different-from-a-regular-eye-exam',
-        10745 => '/what-are-hard-to-fit-contacts-and-who-needs-them',
-        10750 => '/why-computer-vision-exams-are-essential',
-        10755 => '/how-to-choose-the-right-lenses-for-your-vision-and-lifestyle',
-        10770 => '/how-to-choose-the-perfect-eyeglass-frames-for-your-face-shape',
-        12991 => '/how-to-protect-your-eyes-from-digital-strain-in-2026',
-        12996 => '/the-best-fathers-day-gift-for-dads-who-need-and-deserve-great-eyewear',
-        13002 => '/summer-eye-protection-in-forest-hills-what-new-yorkers-need-to-know-before-hitting-the-beach',
-        13119 => '/why-your-child-needs-an-eye-exam-before-school-starts-not-after',
-        13125 => '/the-truth-about-blue-light-glasses-what-they-do-and-dont-do',
-        13131 => '/hard-to-fit-contact-lenses-in-forest-hills-why-some-patients-succeed-here-after-giving-up-elsewhere',
-        13137 => '/premium-eyewear-brands-at-austin-optics-what-makes-silhouette-face-a-face-and-chopard-different',
+        2337 => '/hyperopia-affects-near-vision/',
+        2338 => '/myopia-with-atropine-eye-drop/',
+        2339 => '/scleral-lenses-for-keratoconus-dry-eye/',
+        2340 => '/why-do-i-need-multifocal-lenses/',
+        2341 => '/9-signs-your-child-might-need-glasses/',
+        2342 => '/why-your-child-needs-a-comprehensive-vision-check/',
+        2343 => '/5-signs-your-eyeglass-prescription-is-wrong/',
+        2344 => '/the-pros-and-cons-of-contact-lenses/',
+        10237 => '/contact-lens-exam-vs-eye-exam-whats-the-difference/',
+        10285 => '/cost-of-contact-lens-exams-austin-optics-guide/',
+        10292 => '/your-first-contact-lens-appointment-austin-optics/',
+        10296 => '/contacts-vs-glasses-exam-austin-optics/',
+        10389 => '/why-you-need-an-eye-exam/',
+        10394 => '/top-tips-for-digital-eye-strain-relief/',
+        10400 => '/navigating-eye-care-in-nyc/',
+        10403 => '/top-10-tips-for-digital-eye-strain-relief/',
+        10406 => '/what-your-eyes-reveal/',
+        10409 => '/why-comprehensive-pediatric-eye-exams/',
+        10414 => '/beyond-digital-fatigue-a-medical-guide-to-computer-vision/',
+        10419 => '/tips-to-protect-your-eyes-this-winter-austin-optics/',
+        10733 => '/why-a-contact-lens-exam-is-different-from-a-regular-eye-exam/',
+        10745 => '/what-are-hard-to-fit-contacts-and-who-needs-them/',
+        10750 => '/why-computer-vision-exams-are-essential/',
+        10755 => '/how-to-choose-the-right-lenses-for-your-vision-and-lifestyle/',
+        10770 => '/how-to-choose-the-perfect-eyeglass-frames-for-your-face-shape/',
+        12991 => '/how-to-protect-your-eyes-from-digital-strain-in-2026/',
+        12996 => '/the-best-fathers-day-gift-for-dads-who-need-and-deserve-great-eyewear/',
+        13002 => '/summer-eye-protection-in-forest-hills-what-new-yorkers-need-to-know-before-hitting-the-beach/',
+        13119 => '/why-your-child-needs-an-eye-exam-before-school-starts-not-after/',
+        13125 => '/the-truth-about-blue-light-glasses-what-they-do-and-dont-do/',
+        13131 => '/hard-to-fit-contact-lenses-in-forest-hills-why-some-patients-succeed-here-after-giving-up-elsewhere/',
+        13137 => '/premium-eyewear-brands-at-austin-optics-what-makes-silhouette-face-a-face-and-chopard-different/',
     ];
 
     public static function instance(): self
@@ -353,7 +353,7 @@ class WpContent
         }
 
         if (str_starts_with($path, 'tag/') || str_starts_with($path, 'category/')) {
-            return '/blog';
+            return '/blog/';
         }
 
         if (str_starts_with($path, 'wp-')) {
@@ -361,18 +361,26 @@ class WpContent
         }
 
         if (str_starts_with($path, 'service/')) {
-            return '/'.preg_replace('#/index\.html$#', '', substr($path, strlen('service/')));
+            return '/'.preg_replace('#/index\.html$#', '', substr($path, strlen('service/'))).'/';
         }
 
         if (preg_match('#^(.*?)/index\.html$#', $path, $m)) {
-            return '/'.$m[1];
+            return '/'.$m[1].'/';
         }
 
         if (preg_match('#^https?://#i', $path)) {
             return $path;
         }
 
-        return '/'.ltrim($path, '/');
+        [$base, $fragment] = array_pad(explode('#', ltrim($path, '/'), 2), 2, '');
+        $fragment = $fragment !== '' ? '#'.$fragment : '';
+        $base = rtrim($base, '/');
+
+        if ($base === '' || str_contains(basename($base), '.')) {
+            return '/'.$base.$fragment;
+        }
+
+        return '/'.$base.'/'.$fragment;
     }
 
     private function toLocalUrl(string $path): string
