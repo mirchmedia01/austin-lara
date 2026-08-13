@@ -13,21 +13,21 @@ class SitemapController
     {
         $staticUrls = [
             '/' => ['priority' => '1.0', 'changefreq' => 'daily'],
-            '/about-us' => ['priority' => '0.8', 'changefreq' => 'monthly'],
-            '/meet-the-team' => ['priority' => '0.7', 'changefreq' => 'monthly'],
-            '/awards' => ['priority' => '0.5', 'changefreq' => 'yearly'],
-            '/best-of-boro' => ['priority' => '0.5', 'changefreq' => 'yearly'],
-            '/services' => ['priority' => '0.9', 'changefreq' => 'weekly'],
-            '/eye-vision-exams' => ['priority' => '0.8', 'changefreq' => 'monthly'],
-            '/contact-lens-exams' => ['priority' => '0.8', 'changefreq' => 'monthly'],
-            '/hard-to-fit-contact' => ['priority' => '0.7', 'changefreq' => 'monthly'],
-            '/sunglasses' => ['priority' => '0.7', 'changefreq' => 'monthly'],
-            '/computer-vision' => ['priority' => '0.7', 'changefreq' => 'monthly'],
-            '/lenses' => ['priority' => '0.8', 'changefreq' => 'monthly'],
-            '/insurances' => ['priority' => '0.7', 'changefreq' => 'monthly'],
-            '/frame-selection' => ['priority' => '0.6', 'changefreq' => 'monthly'],
-            '/contact-us' => ['priority' => '0.8', 'changefreq' => 'monthly'],
-            '/blog' => ['priority' => '0.8', 'changefreq' => 'weekly'],
+            '/about-us/' => ['priority' => '0.8', 'changefreq' => 'monthly'],
+            '/meet-the-team/' => ['priority' => '0.7', 'changefreq' => 'monthly'],
+            '/awards/' => ['priority' => '0.5', 'changefreq' => 'yearly'],
+            '/best-of-boro/' => ['priority' => '0.5', 'changefreq' => 'yearly'],
+            '/services/' => ['priority' => '0.9', 'changefreq' => 'weekly'],
+            '/eye-vision-exams/' => ['priority' => '0.8', 'changefreq' => 'monthly'],
+            '/contact-lens-exams/' => ['priority' => '0.8', 'changefreq' => 'monthly'],
+            '/hard-to-fit-contact/' => ['priority' => '0.7', 'changefreq' => 'monthly'],
+            '/sunglasses/' => ['priority' => '0.7', 'changefreq' => 'monthly'],
+            '/computer-vision/' => ['priority' => '0.7', 'changefreq' => 'monthly'],
+            '/lenses/' => ['priority' => '0.8', 'changefreq' => 'monthly'],
+            '/insurances/' => ['priority' => '0.7', 'changefreq' => 'monthly'],
+            '/frame-selection/' => ['priority' => '0.6', 'changefreq' => 'monthly'],
+            '/contact-us/' => ['priority' => '0.8', 'changefreq' => 'monthly'],
+            '/blog/' => ['priority' => '0.8', 'changefreq' => 'weekly'],
         ];
 
         $urls = '';
@@ -38,7 +38,7 @@ class SitemapController
 
         foreach ($this->posts->allPosts() as $post) {
             $urls .= $this->urlEntry(
-                config('seo.base_url').'/'.$post['slug'],
+                config('seo.base_url').'/'.$post['slug'].'/',
                 '0.6',
                 'monthly'
             );
