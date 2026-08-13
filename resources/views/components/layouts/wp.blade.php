@@ -13,6 +13,7 @@
 <head>
 {!! $head !!}
 @stack('styles')
+@include('partials.gtag')
 </head>
 <body class="{{ $bodyClass }}">
 

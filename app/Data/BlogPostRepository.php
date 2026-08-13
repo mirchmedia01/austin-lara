@@ -358,6 +358,62 @@ class BlogPostRepository
             ],
         ];
 
-        return $posts;
+        return array_map(
+            fn (array $post): array => $post + ['category' => $this->category($post['slug'])],
+            $posts
+        );
+    }
+
+    /**
+     * Derive a display category from a post's slug so every article renders a
+     * relevant category badge without duplicating metadata in the post data.
+     */
+    private function category(string $slug): string
+    {
+        return match (true) {
+            str_contains($slug, 'contact-lens'),
+            str_contains($slug, 'contact-lenses'),
+            str_contains($slug, 'contacts'),
+            str_contains($slug, 'hard-to-fit-contact'),
+            str_contains($slug, 'scleral'),
+            str_contains($slug, 'keratoconus') => 'Contact Lenses',
+
+            str_contains($slug, 'child'),
+            str_contains($slug, 'pediatric'),
+            str_contains($slug, 'school') => 'Pediatric Eye Care',
+
+            str_contains($slug, 'digital'),
+            str_contains($slug, 'computer'),
+            str_contains($slug, 'blue-light'),
+            str_contains($slug, 'strain'),
+            str_contains($slug, 'screen') => 'Digital Eye Health',
+
+            str_contains($slug, 'hyperopia'),
+            str_contains($slug, 'myopia'),
+            str_contains($slug, 'atropine') => 'Vision Conditions',
+
+            str_contains($slug, 'eye-exam'),
+            str_contains($slug, 'prescription'),
+            str_contains($slug, 'exam') => 'Eye Exams',
+
+            str_contains($slug, 'multifocal'),
+            str_contains($slug, 'lenses') => 'Lenses & Optics',
+
+            str_contains($slug, 'eyeglass'),
+            str_contains($slug, 'eyewear'),
+            str_contains($slug, 'frame'),
+            str_contains($slug, 'fathers-day') => 'Eyewear & Frames',
+
+            str_contains($slug, 'sunglasses'),
+            str_contains($slug, 'summer'),
+            str_contains($slug, 'winter'),
+            str_contains($slug, 'beach') => 'Eye Protection',
+
+            str_contains($slug, 'eye-care'),
+            str_contains($slug, 'eyes-reveal'),
+            str_contains($slug, 'vision') => 'Eye Health',
+
+            default => 'Eye Care & Vision',
+        };
     }
 }
