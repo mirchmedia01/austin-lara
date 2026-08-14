@@ -1,0 +1,23 @@
+.elementor-105 .elementor-element.elementor-element-7158036 .elementor-posts-container .elementor-post__thumbnail {
+    position: relative;
+    padding-bottom: 0;
+    aspect-ratio: 3 / 2;
+}
+
+.elementor-105 .elementor-element.elementor-element-7158036 .elementor-posts-container .elementor-post__thumbnail img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.elementor-widget-posts .elementor-posts .elementor-post__text {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.elementor-widget-posts .elementor-posts-container .elementor-post__excerpt {
+    flex-grow: 1;
+}

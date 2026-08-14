@@ -1,0 +1,135 @@
+/* Home page fixes (Home only - pushed via @push('styles') in home.blade.php). */
+
+/* ---------------------------------------------------------------------------
+ * Brand/logo carousel (widget 06f9edf)
+ *
+ * Elementor's nested-carousel JS chunks are absent in this static build, so the
+ * swiper never initializes and every slide renders at full width (one oversized,
+ * cover-cropped logo) with dead arrows/pagination and large empty space.
+ * Fallback (no JS): show all brand logos in a centered, wrapped strip at a
+ * consistent size with object-fit: contain, and hide the non-functional
+ * controls.
+ *
+ * Marquee (JS active): home.js duplicates the slides and adds .logo-marquee to
+ * the track, which becomes a seamless right-to-left infinite marquee. Spacing
+ * is applied as per-slide margin so the -50% loop lands exactly on one full
+ * copy of the logos.
+ * ------------------------------------------------------------------------- */
+.elementor-element-06f9edf .e-n-carousel {
+    overflow: hidden;
+}
+
+.elementor-element-06f9edf .e-n-carousel .swiper-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    transform: none;
+}
+
+.elementor-element-06f9edf .e-n-carousel .swiper-wrapper.logo-marquee {
+    flex: 0 0 auto;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 0;
+    width: max-content;
+    will-change: transform;
+    animation: austin-logo-marquee 30s linear infinite;
+}
+
+.elementor-element-06f9edf .e-n-carousel .swiper-wrapper.logo-marquee .swiper-slide {
+    margin-right: 12px;
+}
+
+@keyframes austin-logo-marquee {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-50%);
+    }
+}
+
+.elementor-element-06f9edf .e-n-carousel .swiper-slide {
+    width: auto;
+    flex: 0 1 auto;
+    height: auto !important;
+}
+
+.elementor-element-06f9edf .e-n-carousel .swiper-slide .e-con {
+    height: auto !important;
+    justify-content: center;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
+}
+
+.elementor-element-06f9edf .e-n-carousel .swiper-slide .e-con-inner {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.elementor-element-06f9edf .e-n-carousel .swiper-slide img {
+    width: auto !important;
+    height: 72px;
+    object-fit: contain;
+    object-position: center center;
+}
+
+.elementor-element-06f9edf .elementor-swiper-button,
+.elementor-element-06f9edf .swiper-pagination {
+    display: none !important;
+}
+
+@media (max-width: 1024px) {
+    .elementor-element-06f9edf .e-n-carousel .swiper-slide img {
+        height: 56px;
+    }
+}
+
+@media (max-width: 767px) {
+    .elementor-element-06f9edf .e-n-carousel .swiper-slide img {
+        height: 44px;
+    }
+}
+
+/* ---------------------------------------------------------------------------
+ * "Come See Us in Forest Hills" (section 0c16946)
+ *
+ * Desktop (>=1025px): Elementor's original layout is kept as-is - heading /
+ * buttons on the left, and the Address / Phone / Hours cards stacked
+ * vertically in the right column. No overrides needed here.
+ *
+ * Tablet (768-1024px): stack the two halves and put the three cards
+ * side-by-side. Mobile (<768px) is untouched (Elementor defaults).
+ * ------------------------------------------------------------------------- */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .elementor-element-0c16946 .e-con-inner > .elementor-element-dc6f4b3 {
+        --flex-direction: column;
+        --row-gap: 24px;
+        --column-gap: 0px;
+    }
+
+    .elementor-element-0c16946 .elementor-element-ca3e3b3 {
+        --width: 100%;
+    }
+
+    .elementor-element-0c16946 .elementor-element-8b4c864 {
+        --width: 100%;
+        --flex-direction: row;
+        --flex-wrap: nowrap;
+        --row-gap: 0px;
+        --column-gap: 20px;
+        align-items: stretch;
+    }
+
+    .elementor-element-0c16946 .elementor-element-8b4c864 > .e-con {
+        --flex-grow: 1;
+        --flex-shrink: 1;
+        --flex-basis: 0%;
+        min-width: 0;
+    }
+}

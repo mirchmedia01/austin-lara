@@ -1,5 +1,9 @@
 <x-layouts.wp page="blog" :seoTitle="$seoTitle ?? null" :seoDescription="$seoDescription ?? null">
 
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/blog.css') }}">
+    @endpush
+
     @php $blogParts = \App\Support\WpContent::instance()->blogMainParts(); @endphp
 
     {!! $blogParts['before'] !!}
