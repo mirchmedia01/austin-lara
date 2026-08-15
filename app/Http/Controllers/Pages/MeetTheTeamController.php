@@ -33,16 +33,6 @@ class MeetTheTeamController extends Controller
                 ],
             ],
             [
-                'name' => 'Dr. Anushka Mistry, OD',
-                'role' => 'Doctor of Optometry',
-                'photo' => 'images/uploads/2026/05/Dr.-Anushka-Mistry.png',
-                'bio' => [
-                    'Dr. Anushka Mistry is the optometrist at Austin Optics, providing full eye health assessments for patients of all ages. She earned her Doctor of Optometry degree from Nova Southeastern University and completed advanced residency training in Vision Therapy and Pediatrics at SUNY College of Optometry.',
-                    'Her training covers routine annual exams through to advanced diagnostics including glaucoma screening, cataract assessment, and retinal health. She brings particular depth in pediatric eye care and vision therapy.',
-                    'Dr. Mistry is in two to three days per week. If you are due for a full eye exam or have not had one in over a year, booking with her is the right place to start.',
-                ],
-            ],
-            [
                 'name' => 'Dr. Elina Shalamov',
                 'role' => 'Licensed & Board Certified Optometrist',
                 'photo' => 'images/uploads/2026/08/elina.png',
