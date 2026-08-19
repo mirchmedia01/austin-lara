@@ -12,6 +12,7 @@
 <html lang="en-US">
 <head>
 {!! $head !!}
+<link rel="stylesheet" href="{{ asset('css/mobile-nav.css') }}">
 @stack('styles')
 @include('partials.gtag')
 </head>
@@ -21,12 +22,16 @@
 
 {!! $header !!}
 
+{{-- Mobile Navigation Sidebar --}}
+<x-mobile-nav />
+
 {{ $slot }}
 
 {!! $footer !!}
 
 {!! $scripts !!}
 
+<script src="{{ asset('js/app.js') }}" defer></script>
 @stack('scripts')
 
 </body>

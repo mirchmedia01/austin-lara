@@ -12,6 +12,20 @@
         var nav = document.getElementById('mobile-nav');
         var closeBtn = document.getElementById('mobile-nav-close');
 
+        // WordPress-parity pages render the original Elementor header, whose
+        // burger has no working JS in the static export. Fall back to it for
+        // opening the same sidebar drawer.
+        var wpToggles = Array.prototype.slice.call(
+            document.querySelectorAll('.elementor-menu-toggle')
+        );
+
+        function syncWpToggle(isOpen) {
+            wpToggles.forEach(function (el) {
+                el.classList.toggle('elementor-active', isOpen);
+                el.setAttribute('aria-expanded', String(isOpen));
+            });
+        }
+
         function openNav() {
             if (!nav) return;
             nav.classList.add('is-open');
@@ -20,6 +34,7 @@
                 toggle.classList.add('is-open');
                 toggle.setAttribute('aria-expanded', 'true');
             }
+            syncWpToggle(true);
             document.body.style.overflow = 'hidden';
         }
 
@@ -31,6 +46,7 @@
                 toggle.classList.remove('is-open');
                 toggle.setAttribute('aria-expanded', 'false');
             }
+            syncWpToggle(false);
             document.body.style.overflow = '';
         }
 
@@ -41,6 +57,19 @@
                 } else {
                     openNav();
                 }
+            });
+        } else if (wpToggles.length && nav) {
+            // Elementor burger (WordPress-parity pages): open the sidebar,
+            // and stop the dropdown <nav> from receiving the click.
+            wpToggles.forEach(function (wpToggle) {
+                wpToggle.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    if (nav.classList.contains('is-open')) {
+                        closeNav();
+                    } else {
+                        openNav();
+                    }
+                });
             });
         }
 
@@ -161,5 +190,54 @@
                 }
             });
         });
+
+        /* ─── Animated Counters (Elementor counter widgets) ─────────────── */
+        // The original Elementor counter JS was not captured in the static
+        // export, so animate the numbers here: count from data-from-value to
+        // data-to-value once the element scrolls into view.
+        var counters = document.querySelectorAll('.elementor-counter-number');
+
+        if (counters.length && 'IntersectionObserver' in window) {
+            var counterObserver = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (!entry.isIntersecting) return;
+
+                    var el = entry.target;
+                    counterObserver.unobserve(el);
+
+                    var from = parseInt(el.getAttribute('data-from-value'), 10) || 0;
+                    var to = parseInt(el.getAttribute('data-to-value'), 10);
+                    var duration = parseInt(el.getAttribute('data-duration'), 10) || 2000;
+                    var delimiter = el.getAttribute('data-delimiter') || '';
+                    var start = null;
+
+                    if (isNaN(to)) return;
+
+                    function format(value) {
+                        var text = String(Math.round(value));
+                        if (delimiter) {
+                            text = text.replace(/\B(?=(\d{3})+(?!\d))/g, delimiter);
+                        }
+                        return text;
+                    }
+
+                    function tick(timestamp) {
+                        if (start === null) start = timestamp;
+                        var progress = Math.min((timestamp - start) / duration, 1);
+                        var eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+                        el.textContent = format(from + (to - from) * eased);
+                        if (progress < 1) {
+                            requestAnimationFrame(tick);
+                        }
+                    }
+
+                    requestAnimationFrame(tick);
+                });
+            }, { threshold: 0.3 });
+
+            counters.forEach(function (el) {
+                counterObserver.observe(el);
+            });
+        }
     });
 })();
