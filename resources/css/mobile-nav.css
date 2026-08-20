@@ -3,6 +3,26 @@
    without pulling in the full app.css (which would clash with Elementor CSS). */
 @import './tokens.css';
 
+:root {
+    --color-navy: #02216A;
+    --color-navy-dark: #08104D;
+    --color-white: #ffffff;
+    --color-gold: #c9a84c;
+    --font-sans: 'DM Sans', sans-serif;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --weight-medium: 500;
+    --weight-semibold: 600;
+    --radius-full: 9999px;
+    --transition-fast: 0.15s ease;
+    --transition-base: 0.3s ease;
+    --space-sm: 0.5rem;
+    --space-md: 1rem;
+    --space-xl: 2rem;
+    --container-px: 1.5rem;
+}
+
 /* ─── Buttons (variants used by the sidebar footer) ─────────────────────── */
 .btn {
     display: inline-flex;

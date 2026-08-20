@@ -12,6 +12,10 @@
 <html lang="en-US">
 <head>
 {!! $head !!}
+<style>
+.mobile-nav { display: none; }
+.mobile-nav.is-open { display: flex; }
+</style>
 <link rel="stylesheet" href="{{ asset('css/mobile-nav.css') }}">
 @stack('styles')
 @include('partials.gtag')
