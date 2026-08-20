@@ -5,7 +5,7 @@
 (function () {
     'use strict';
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function init() {
 
         /* ─── Mobile Navigation ─────────────────────────────────────────── */
         var toggle = document.getElementById('mobile-menu-toggle');
@@ -247,47 +247,66 @@
         // data-to-value once the element scrolls into view.
         var counters = document.querySelectorAll('.elementor-counter-number');
 
-        if (counters.length && 'IntersectionObserver' in window) {
-            var counterObserver = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (!entry.isIntersecting) return;
+        function animateCounter(el) {
+            if (el.dataset.counterAnimated === 'true') return;
+            el.dataset.counterAnimated = 'true';
 
-                    var el = entry.target;
-                    counterObserver.unobserve(el);
+            var from = parseInt(el.getAttribute('data-from-value'), 10) || 0;
+            var to = parseInt(el.getAttribute('data-to-value'), 10);
+            var duration = parseInt(el.getAttribute('data-duration'), 10) || 2000;
+            var delimiter = el.getAttribute('data-delimiter') || '';
+            var start = null;
 
-                    var from = parseInt(el.getAttribute('data-from-value'), 10) || 0;
-                    var to = parseInt(el.getAttribute('data-to-value'), 10);
-                    var duration = parseInt(el.getAttribute('data-duration'), 10) || 2000;
-                    var delimiter = el.getAttribute('data-delimiter') || '';
-                    var start = null;
+            if (isNaN(to)) return;
 
-                    if (isNaN(to)) return;
+            function format(value) {
+                var text = String(Math.round(value));
+                if (delimiter) {
+                    text = text.replace(/\B(?=(\d{3})+(?!\d))/g, delimiter);
+                }
+                return text;
+            }
 
-                    function format(value) {
-                        var text = String(Math.round(value));
-                        if (delimiter) {
-                            text = text.replace(/\B(?=(\d{3})+(?!\d))/g, delimiter);
-                        }
-                        return text;
-                    }
-
-                    function tick(timestamp) {
-                        if (start === null) start = timestamp;
-                        var progress = Math.min((timestamp - start) / duration, 1);
-                        var eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
-                        el.textContent = format(from + (to - from) * eased);
-                        if (progress < 1) {
-                            requestAnimationFrame(tick);
-                        }
-                    }
-
+            function tick(timestamp) {
+                if (start === null) start = timestamp;
+                var progress = Math.min((timestamp - start) / duration, 1);
+                var eased = 1 - Math.pow(1 - progress, 3); // easeOutCubic
+                el.textContent = format(from + (to - from) * eased);
+                if (progress < 1) {
                     requestAnimationFrame(tick);
-                });
-            }, { threshold: 0.3 });
+                } else {
+                    el.textContent = format(to);
+                }
+            }
 
-            counters.forEach(function (el) {
-                counterObserver.observe(el);
-            });
+            requestAnimationFrame(tick);
         }
-    });
+
+        if (counters.length) {
+            if ('IntersectionObserver' in window) {
+                var counterObserver = new IntersectionObserver(function (entries) {
+                    entries.forEach(function (entry) {
+                        if (entry.isIntersecting) {
+                            counterObserver.unobserve(entry.target);
+                            animateCounter(entry.target);
+                        }
+                    });
+                }, { threshold: 0.1 });
+
+                counters.forEach(function (el) {
+                    counterObserver.observe(el);
+                });
+            } else {
+                counters.forEach(function (el) {
+                    animateCounter(el);
+                });
+            }
+        }
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+    } else {
+        init();
+    }
 })();
