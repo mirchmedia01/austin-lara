@@ -34,10 +34,10 @@ class MeetTheTeamController extends Controller
             ],
             [
                 'name' => 'Dr. Elina Shalamov',
-                'role' => 'Licensed & Board Certified Doctor of Optometry',
+                'role' => 'Doctor of Optometry',
                 'photo' => 'images/uploads/2026/08/elina.png',
                 'bio' => [
-                    'Dr. Elina Shalamov is a licensed and board certified Doctor of Optometry and a graduate of the Pennsylvania College of Optometry. She is dedicated to providing comprehensive and patient-centered eye care for patients of all ages.',
+                    'Dr. Elina Shalamov is a Doctor of Optometry and a graduate of the Pennsylvania College of Optometry. She is dedicated to providing comprehensive and patient-centered eye care for patients of all ages.',
                     'Dr. Shalamov completed externships at the Northport VA Medical Center and Ophthalmic Consultants of Connecticut, where she worked alongside experienced Optometrists and Ophthalmologists. She gained extensive experience in the diagnosis and management of ocular disease, glaucoma, dry eye, pediatrics, low vision rehabilitation, and specialty contact lens fitting.',
                     'Dr. Shalamov is committed to providing the best care for patients by developing individualized treatment plans to preserve vision and promote lifelong ocular health.',
                 ],

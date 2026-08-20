@@ -191,6 +191,56 @@
             });
         });
 
+        /* ─── Elementor Nav Dropdowns (WordPress-parity pages) ──────────── */
+        // The Elementor Pro JS that reveals sub-menus on hover/click does not
+        // run in the static export, so drive the dropdowns here: hover shows
+        // them on desktop, click toggles them, and the .is-open class (plus a
+        // plain CSS :hover rule) reveals the sub-menu.
+        var wpMenus = document.querySelectorAll('.elementor-nav-menu--main .elementor-nav-menu');
+
+        wpMenus.forEach(function (menu) {
+            var parents = Array.prototype.slice.call(
+                menu.querySelectorAll('> li.menu-item-has-children')
+            );
+
+            function closeAll(except) {
+                parents.forEach(function (li) {
+                    if (li !== except) {
+                        li.classList.remove('is-open');
+                    }
+                });
+            }
+
+            parents.forEach(function (li) {
+                var link = li.querySelector(':scope > a');
+
+                li.addEventListener('mouseenter', function () {
+                    closeAll(li);
+                    li.classList.add('is-open');
+                });
+                li.addEventListener('mouseleave', function () {
+                    li.classList.remove('is-open');
+                });
+
+                // Parent links with a sub-menu only toggle the dropdown (the
+                // captured hrefs are dead anchors anyway).
+                if (link) {
+                    link.addEventListener('click', function (event) {
+                        var willOpen = !li.classList.contains('is-open');
+                        closeAll(li);
+                        li.classList.toggle('is-open', willOpen);
+                        event.preventDefault();
+                    });
+                }
+            });
+
+            document.addEventListener('click', function (event) {
+                if (!menu.contains(event.target)) {
+                    closeAll(null);
+                }
+            });
+        });
+
         /* ─── Animated Counters (Elementor counter widgets) ─────────────── */
         // The original Elementor counter JS was not captured in the static
         // export, so animate the numbers here: count from data-from-value to
