@@ -34,7 +34,7 @@ class MeetTheTeamController extends Controller
             ],
             [
                 'name' => 'Dr. Elina Shalamov',
-                'role' => 'Doctor of Optometry',
+                'role' => 'Licensed Optometrist',
                 'photo' => 'images/uploads/2026/08/elina.png',
                 'bio' => [
                     'Dr. Elina Shalamov is a Doctor of Optometry and a graduate of the Pennsylvania College of Optometry. She is dedicated to providing comprehensive and patient-centered eye care for patients of all ages.',
