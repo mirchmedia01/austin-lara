@@ -19,6 +19,9 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(prepend: [
             \App\Http\Middleware\ForceTrailingSlash::class,
         ]);
+        $middleware->web(append: [
+            \App\Http\Middleware\ImageSeoAttributes::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -3,7 +3,7 @@
     <button class="mobile-nav__close" id="mobile-nav-close" aria-label="Close navigation menu">&times;</button>
 
     <a href="{{ route('home') }}" class="mobile-nav__logo">
-        <img src="{{ asset('images/uploads/2026/05/Austin-optics-logo-white-scaled-2.png') }}" alt="Austin Optics" height="28">
+        <img src="{{ asset('images/uploads/2026/05/Austin-optics-logo-white-scaled-2.png') }}" alt="Austin Optics" title="Austin Optics" height="28">
     </a>
 
     <ul class="mobile-nav__list" role="list">

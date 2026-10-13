@@ -314,7 +314,62 @@ class WpContent
             $html
         );
 
-        return $html;
+        return $this->addImageAttributes($html);
+    }
+
+    /**
+     * Fill missing/empty alt + title on every <img> from its filename so SEO
+     * checkers stop flagging them (e.g. Chopard.png => "Chopard").
+     * Idempotent — images that already have both are left untouched.
+     */
+    public function addImageAttributes(string $html): string
+    {
+        return preg_replace_callback(
+            '#<img\b([^>]*?)(/?)>#i',
+            function ($m) {
+                $attrs = $m[1];
+                $close = $m[2];
+
+                $hasAlt = preg_match('#\salt\s*=\s*("[^"]*"|\'[^\']*\')#i', $attrs, $am);
+                $altVal = $hasAlt ? trim($am[1], '"\'') : '';
+                $hasTitle = preg_match('#\stitle\s*=\s*("[^"]*"|\'[^\']*\')#i', $attrs);
+
+                if ($hasAlt && $altVal !== '' && $hasTitle) {
+                    return $m[0];
+                }
+
+                $text = '';
+                if (preg_match('#\ssrc\s*=\s*"([^"]+)"#i', $attrs, $sm) || preg_match("#\ssrc\s*=\s*'([^']+)'#i", $attrs, $sm)) {
+                    $text = $this->imageTextFromSrc($sm[1]);
+                }
+                if ($text === '') {
+                    $text = 'Austin Optics';
+                }
+
+                if (! $hasAlt || $altVal === '') {
+                    $attrs = preg_replace('#\salt\s*=\s*("[^"]*"|\'[^\']*\')#i', '', $attrs);
+                    $attrs .= ' alt="'.e($text).'"';
+                }
+                if (! $hasTitle) {
+                    $attrs .= ' title="'.e($hasAlt && $altVal !== '' ? $altVal : $text).'"';
+                }
+
+                return '<img'.$attrs.$close.'>';
+            },
+            $html
+        );
+    }
+
+    private function imageTextFromSrc(string $src): string
+    {
+        $base = basename(explode('?', $src)[0]);
+        $base = preg_replace('/\.(jpe?g|png|webp|gif|svg|avif)$/i', '', $base);
+        // Strip WP size/scale suffixes: -300x105, -1024x110, -scaled-2, -150x150.
+        $base = preg_replace('/-\d+x\d+$/', '', $base);
+        $base = preg_replace('/-scaled(-\d+)?$/', '', $base);
+        $text = ucwords(trim(preg_replace('/[-_]+/', ' ', $base)));
+
+        return $text;
     }
 
     private function rewriteSrcset(string $value): string
