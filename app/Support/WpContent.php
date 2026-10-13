@@ -105,7 +105,7 @@ class WpContent
 
     public function header(string $page): string
     {
-        return $this->rewrite($this->extract($this->source($page), '<header', '</header>'));
+        return $this->menuFixes($this->rewrite($this->extract($this->source($page), '<header', '</header>')));
     }
 
     public function main(string $page): string
@@ -115,7 +115,21 @@ class WpContent
 
     public function footer(string $page): string
     {
-        return $this->rewrite($this->extract($this->source($page), '<footer', '</footer>'));
+        return $this->menuFixes($this->rewrite($this->extract($this->source($page), '<footer', '</footer>')));
+    }
+
+    /**
+     * Menu fixes for the static Elementor copy: the About dropdown parent was
+     * a dead "#" toggle on the original site — point it at the real page so
+     * it navigates (submenu still opens on hover / first tap via fallback).
+     */
+    private function menuFixes(string $html): string
+    {
+        return str_replace(
+            'href="/" class="elementor-item elementor-item-anchor">About Us',
+            'href="/about-us/" class="elementor-item elementor-item-anchor">About Us',
+            $html
+        );
     }
 
     public function scripts(string $page): string
@@ -341,53 +355,57 @@ class WpContent
             $path = substr($path, 3);
         }
 
+        // Split off #fragment BEFORE resolving so URLs like
+        // contact-lens-exams/index.html#/ or index.html@p=40.html# resolve
+        // to live routes instead of dead pages.
+        $fragment = '';
+        if (str_contains($path, '#')) {
+            [$path, $frag] = explode('#', $path, 2);
+            $fragment = ($frag === '' || $frag === '/') ? '' : '#'.$frag;
+        }
+        $withFrag = fn (string $local): string => $local.$fragment;
+
         if ($path === 'index.html' || $path === '') {
-            return '/';
+            return $withFrag('/');
         }
 
         if (! str_starts_with($path, 'index.html')) {
             $path = preg_replace('#@[^/]*$#', '', $path);
         }
 
-        if (preg_match('#^index\.html(\#[^/]*)?$#', $path, $m)) {
-            return '/'.($m[1] ?? '');
-        }
-
-        if (preg_match('#^index\.html@p=(\d+)(?:\.html)?(\#[^/]*)?$#', $path, $m)) {
+        if (preg_match('#^index\.html@p=(\d+)(?:\.html)?$#', $path, $m)) {
             $route = $this->pageRoutes[$m[1]] ?? '/';
 
-            return $route.($m[2] ?? '');
+            return $withFrag($route);
         }
 
         if (str_starts_with($path, 'tag/') || str_starts_with($path, 'category/')) {
-            return '/blog/';
+            return $withFrag('/blog/');
         }
 
         if (str_starts_with($path, 'wp-')) {
-            return '/'.$path;
+            return $withFrag('/'.$path);
         }
 
         if (str_starts_with($path, 'service/')) {
-            return '/'.preg_replace('#/index\.html$#', '', substr($path, strlen('service/'))).'/';
+            return $withFrag('/'.preg_replace('#/index\.html$#', '', substr($path, strlen('service/'))).'/');
         }
 
         if (preg_match('#^(.*?)/index\.html$#', $path, $m)) {
-            return '/'.$m[1].'/';
+            return $withFrag('/'.$m[1].'/');
         }
 
         if (preg_match('#^https?://#i', $path)) {
-            return $path;
+            return $withFrag($path);
         }
 
-        [$base, $fragment] = array_pad(explode('#', ltrim($path, '/'), 2), 2, '');
-        $fragment = $fragment !== '' ? '#'.$fragment : '';
-        $base = rtrim($base, '/');
+        $base = rtrim(ltrim($path, '/'), '/');
 
         if ($base === '' || str_contains(basename($base), '.')) {
-            return '/'.$base.$fragment;
+            return $withFrag('/'.$base);
         }
 
-        return '/'.$base.'/'.$fragment;
+        return $withFrag('/'.$base.'/');
     }
 
     private function toLocalUrl(string $path): string
@@ -425,17 +443,24 @@ class WpContent
 
     private function finalizeHead(string $head, ?string $seoTitle, ?string $seoDescription, ?string $ogImage): string
     {
-        $url = request()->url();
+        // request()->url() drops the trailing slash; rebuild from path info so
+        // canonical/og:url match the real (slashed) URL that returns 200.
+        $path = request()->getPathInfo() ?: '/';
+        $isFile = str_contains(basename($path), '.');
+        $url = rtrim(request()->getSchemeAndHttpHost().$path, '/').($isFile ? '' : '/');
+
+        // Site-wide og:image fallback (admin per-page og_image wins when set).
+        $ogImage ??= config('seo.og_image');
 
         $head = preg_replace(
-            '#<link rel="canonical" href="[^"]*" ?/>#',
+            '#<link\s+rel="canonical"\s+href="[^"]*"\s*/?>#i',
             '<link rel="canonical" href="'.e($url).'" />',
             $head,
             1
         );
 
         $head = preg_replace(
-            '#<meta property="og:url" content="[^"]*" ?/>#',
+            '#<meta\s+property="og:url"\s+content="[^"]*"\s*/?>#i',
             '<meta property="og:url" content="'.e($url).'" />',
             $head,
             1
@@ -443,13 +468,13 @@ class WpContent
 
         if ($seoTitle !== null) {
             $head = preg_replace(
-                '#<title>[^<]*</title>#',
+                '#<title>[^<]*</title>#i',
                 '<title>'.e($seoTitle).'</title>',
                 $head,
                 1
             );
             $head = preg_replace(
-                '#<meta property="og:title" content="[^"]*" ?/>#',
+                '#<meta\s+property="og:title"\s+content="[^"]*"\s*/?>#i',
                 '<meta property="og:title" content="'.e($seoTitle).'" />',
                 $head,
                 1
@@ -458,24 +483,43 @@ class WpContent
 
         if ($seoDescription !== null) {
             $head = preg_replace(
-                '#<meta name="description" content="[^"]*" ?/>#',
+                '#<meta\s+name="description"\s+content="[^"]*"\s*/?>#i',
                 '<meta name="description" content="'.e($seoDescription).'" />',
                 $head,
-                1
+                1,
+                $descCount
             );
+            // Home/services sources have no description tag at all — insert one.
+            if (! $descCount) {
+                $head = preg_replace(
+                    '#(<title>[^<]*</title>)#i',
+                    '$1'."\n".'<meta name="description" content="'.e($seoDescription).'" />',
+                    $head,
+                    1
+                );
+            }
             $head = preg_replace(
-                '#<meta property="og:description" content="[^"]*" ?/>#',
+                '#<meta\s+property="og:description"\s+content="[^"]*"\s*/?>#i',
                 '<meta property="og:description" content="'.e($seoDescription).'" />',
                 $head,
-                1
+                1,
+                $ogDescCount
             );
+            if (! $ogDescCount) {
+                $head = preg_replace(
+                    '#(<meta\s+name="description"\s+content="[^"]*"\s*/?>)#i',
+                    '$1'."\n".'<meta property="og:description" content="'.e($seoDescription).'" />',
+                    $head,
+                    1
+                );
+            }
         }
 
         if ($ogImage !== null) {
             $image = str_replace('/images/uploads/', '/wp-content/uploads/', $this->toLocal($ogImage));
 
             $head = preg_replace(
-                '#<meta property="og:image" content="[^"]*" ?/>#',
+                '#<meta\s+property="og:image"\s+content="[^"]*"\s*/?>#i',
                 '<meta property="og:image" content="'.$image.'" />',
                 $head,
                 1
