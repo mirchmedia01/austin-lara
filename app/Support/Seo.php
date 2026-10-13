@@ -24,11 +24,13 @@ class Seo
     {
         try {
             if (! Schema::hasTable('seo_settings')) {
+                error_log('[SEO-DBG] '.date('H:i:s')." page={$pageKey} NO TABLE -> fallback");
+
                 return [$fallbackTitle, $fallbackDescription, $fallbackImage];
             }
 
-            // Short cache so admin edits show on the site almost immediately.
             $row = Cache::remember("seo.{$pageKey}", 60, fn () => SeoSetting::query()->where('page_key', $pageKey)->first());
+            error_log('[SEO-DBG] '.date('H:i:s')." page={$pageKey} row=".($row ? "id={$row->id} title=".substr((string) $row->seo_title, 0, 40) : 'NULL'));
 
             if (! $row) {
                 return [$fallbackTitle, $fallbackDescription, $fallbackImage];
@@ -39,7 +41,9 @@ class Seo
                 $row->seo_description ?: $fallbackDescription,
                 $row->og_image ?: $fallbackImage,
             ];
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            error_log('[SEO-DBG] '.date('H:i:s')." page={$pageKey} EX: ".get_class($e).': '.substr($e->getMessage(), 0, 200));
+
             return [$fallbackTitle, $fallbackDescription, $fallbackImage];
         }
     }
