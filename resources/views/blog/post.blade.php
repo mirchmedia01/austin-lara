@@ -6,7 +6,10 @@
 
 @php
     $wp = \App\Support\WpContent::instance();
-    $postHtml = (string) view('blog.posts.'.$post['slug'], ['post' => $post])->render();
+    // DB-managed body (rich editor HTML) wins; otherwise render the legacy Blade article.
+    $postHtml = !empty($post['body_html'])
+        ? (string) $post['body_html']
+        : (string) view('blog.posts.'.$post['slug'], ['post' => $post])->render();
     $bodyHtml = $wp->postContent($postHtml);
     $readTime = max(1, (int) ceil(str_word_count(strip_tags($bodyHtml)) / 200));
     $category = $post['category'] ?? 'Eye Care & Vision';

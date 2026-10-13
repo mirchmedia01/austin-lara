@@ -11,7 +11,10 @@
 <div class="max-w-5xl mx-auto">
 <div class="flex items-center justify-between">
 <h1 class="text-2xl font-bold">SEO / Titles (MySQL)</h1>
+<div class="flex items-center gap-3">
+<a href="{{ route('admin.blog.index') }}" class="text-sm text-blue-600 underline">Blog</a>
 <form method="POST" action="{{ route('admin.logout') }}">@csrf<button class="text-sm text-slate-500 underline">Logout</button></form>
+</div>
 </div>
 @if(session('status'))
 <div class="mt-4 rounded bg-green-50 text-green-700 text-sm p-3">{{ session('status') }}</div>

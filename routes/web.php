@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\BlogController as AdminBlogController;
 use App\Http\Controllers\Admin\SeoController as AdminSeoController;
 use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Blog\BlogPostController;
@@ -40,6 +41,14 @@ Route::prefix('admin')->name('admin.')->group(function (): void {
         Route::get('/seo', [AdminSeoController::class, 'index'])->name('seo.index');
         Route::get('/seo/{seo}', [AdminSeoController::class, 'edit'])->name('seo.edit');
         Route::put('/seo/{seo}', [AdminSeoController::class, 'update'])->name('seo.update');
+        Route::get('/blog', [AdminBlogController::class, 'index'])->name('blog.index');
+        Route::get('/blog/new', [AdminBlogController::class, 'create'])->name('blog.create');
+        Route::post('/blog', [AdminBlogController::class, 'store'])->name('blog.store');
+        Route::post('/blog/import', [AdminBlogController::class, 'importExisting'])->name('blog.import');
+        Route::post('/blog/upload-image', [AdminBlogController::class, 'uploadImage'])->name('blog.upload-image');
+        Route::get('/blog/{blog}/edit', [AdminBlogController::class, 'edit'])->name('blog.edit');
+        Route::put('/blog/{blog}', [AdminBlogController::class, 'update'])->name('blog.update');
+        Route::delete('/blog/{blog}', [AdminBlogController::class, 'destroy'])->name('blog.destroy');
     });
 });
 

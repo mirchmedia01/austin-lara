@@ -2,11 +2,15 @@
 
 namespace App\Data;
 
+use App\Models\BlogPost;
+use Illuminate\Support\Facades\Schema;
+
 /**
  * BlogPostRepository
  *
- * Single source of truth for all blog post metadata and content.
- * Each post maps directly to a source page from the original WordPress site.
+ * DB-first (MySQL `blog_posts` table, managed in /admin/blog), with the
+ * original hardcoded catalog as a fallback so the blog never breaks when
+ * the DB is empty or unavailable. Same shape as ETCPA's FallbackPosts.
  */
 class BlogPostRepository
 {
@@ -33,7 +37,43 @@ class BlogPostRepository
         return array_slice($this->posts(), 0, $limit);
     }
 
+    /** @return array<int, array<string, mixed>> Hardcoded catalog (fallback + import source) */
+    public function fallbackPosts(): array
+    {
+        return array_map(
+            fn (array $post): array => $post + ['category' => $this->category($post['slug'])],
+            $this->fallbackData()
+        );
+    }
+
     private function posts(): array
+    {
+        try {
+            if (Schema::hasTable('blog_posts') && BlogPost::query()->where('is_public', true)->exists()) {
+                $db = BlogPost::query()->where('is_public', true)
+                    ->orderByDesc('published_at')
+                    ->orderByDesc('id')
+                    ->get()
+                    ->map(fn (BlogPost $p) => $p->toPostArray())
+                    ->all();
+
+                // Keep any fallback posts not (yet) imported, preserving order.
+                $dbSlugs = collect($db)->map(fn ($p) => $p['slug'])->all();
+                $rest = array_values(array_filter(
+                    $this->fallbackPosts(),
+                    fn (array $p) => ! in_array($p['slug'], $dbSlugs, true)
+                ));
+
+                return array_merge($db, $rest);
+            }
+        } catch (\Throwable) {
+            // Fall through to hardcoded catalog.
+        }
+
+        return $this->fallbackPosts();
+    }
+
+    private function fallbackData(): array
     {
         $posts = [
             [
@@ -358,10 +398,7 @@ class BlogPostRepository
             ],
         ];
 
-        return array_map(
-            fn (array $post): array => $post + ['category' => $this->category($post['slug'])],
-            $posts
-        );
+        return $posts;
     }
 
     /**

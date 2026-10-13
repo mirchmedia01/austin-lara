@@ -16,7 +16,8 @@ class BlogPostController extends Controller
     {
         $post = $this->posts->findBySlug($slug);
 
-        if ($post === null) {
+        // Hidden (unpublished in admin) posts are not publicly visible.
+        if ($post === null || ($post['is_public'] ?? true) === false) {
             abort(404);
         }
 
