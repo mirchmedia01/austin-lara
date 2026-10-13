@@ -10,6 +10,12 @@
 <body class="min-h-screen bg-slate-100 p-6">
 <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow p-8">
 <h1 class="text-xl font-bold">Edit: {{ $seo->label }} <span class="text-sm font-normal text-slate-400">{{ $seo->page_key }}</span></h1>
+@if(session('status'))
+<div class="mt-4 rounded bg-green-50 text-green-700 text-sm p-3">{{ session('status') }}</div>
+@endif
+@if($errors->any())
+<div class="mt-4 rounded bg-red-50 text-red-700 text-sm p-3">{{ $errors->first() }}</div>
+@endif
 <form method="POST" action="{{ route('admin.seo.update', $seo) }}" class="mt-6 space-y-4">
 @csrf @method('PUT')
 <div>

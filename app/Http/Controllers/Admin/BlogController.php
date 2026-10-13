@@ -122,7 +122,7 @@ class BlogController extends Controller
             'image' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:5120'],
         ]);
 
-        $dir = public_path('blog');
+        $dir = public_path('uploads/blog');
         if (! is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
@@ -132,7 +132,7 @@ class BlogController extends Controller
         $filename = $name.'-'.Str::random(8).'.'.$data['image']->extension();
         $data['image']->move($dir, $filename);
 
-        return response()->json(['url' => '/blog/'.$filename]);
+        return response()->json(['url' => '/uploads/blog/'.$filename]);
     }
 
     private function validated(Request $request): array

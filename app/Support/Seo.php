@@ -27,7 +27,8 @@ class Seo
                 return [$fallbackTitle, $fallbackDescription, $fallbackImage];
             }
 
-            $row = Cache::remember("seo.{$pageKey}", 300, fn () => SeoSetting::query()->where('page_key', $pageKey)->first());
+            // Short cache so admin edits show on the site almost immediately.
+            $row = Cache::remember("seo.{$pageKey}", 60, fn () => SeoSetting::query()->where('page_key', $pageKey)->first());
 
             if (! $row) {
                 return [$fallbackTitle, $fallbackDescription, $fallbackImage];
