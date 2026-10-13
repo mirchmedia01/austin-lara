@@ -12,6 +12,10 @@ use Illuminate\Support\Facades\Schema;
  * Titles/descriptions live in the `seo_settings` MySQL table on Railway.
  * If the DB is unavailable (or no row exists), the passed fallback is used,
  * so the site never breaks.
+ *
+ * NOTE: only plain arrays are cached — never Eloquent models. Cached models
+ * can unserialize to __PHP_Incomplete_Class on production and break every
+ * read until TTL expiry.
  */
 class Seo
 {
@@ -24,27 +28,40 @@ class Seo
     {
         try {
             if (! Schema::hasTable('seo_settings')) {
-                error_log('[SEO-DBG] '.date('H:i:s')." page={$pageKey} NO TABLE -> fallback");
-
                 return [$fallbackTitle, $fallbackDescription, $fallbackImage];
             }
 
-            $row = Cache::remember("seo.{$pageKey}", 60, fn () => SeoSetting::query()->where('page_key', $pageKey)->first());
-            error_log('[SEO-DBG] '.date('H:i:s')." page={$pageKey} row=".($row ? "id={$row->id} title=".substr((string) $row->seo_title, 0, 40) : 'NULL'));
+            $row = Cache::remember(
+                "seo.{$pageKey}",
+                60,
+                fn () => SeoSetting::query()->where('page_key', $pageKey)->first()?->only(['seo_title', 'seo_description', 'og_image'])
+            );
 
-            if (! $row) {
+            if (! is_array($row)) {
                 return [$fallbackTitle, $fallbackDescription, $fallbackImage];
             }
 
             return [
-                $row->seo_title ?: $fallbackTitle,
-                $row->seo_description ?: $fallbackDescription,
-                $row->og_image ?: $fallbackImage,
+                $row['seo_title'] ?: $fallbackTitle,
+                $row['seo_description'] ?: $fallbackDescription,
+                $row['og_image'] ?: $fallbackImage,
             ];
-        } catch (\Throwable $e) {
-            error_log('[SEO-DBG] '.date('H:i:s')." page={$pageKey} EX: ".get_class($e).': '.substr($e->getMessage(), 0, 200));
-
+        } catch (\Throwable) {
             return [$fallbackTitle, $fallbackDescription, $fallbackImage];
+        }
+    }
+
+    /** Write-through cache so admin edits are live on the very next request. */
+    public static function refresh(string $pageKey): void
+    {
+        try {
+            $row = SeoSetting::query()->where('page_key', $pageKey)->first()?->only(['seo_title', 'seo_description', 'og_image']);
+            if (is_array($row)) {
+                Cache::put("seo.{$pageKey}", $row, 60);
+            } else {
+                Cache::forget("seo.{$pageKey}");
+            }
+        } catch (\Throwable) {
         }
     }
 

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\SeoSetting;
 use App\Support\Seo;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\View\View;
 
 class SeoController extends Controller
@@ -49,7 +48,7 @@ class SeoController extends Controller
         ]);
 
         $seo->update($data);
-        Cache::forget("seo.{$seo->page_key}");
+        Seo::refresh($seo->page_key);
 
         return redirect()->route('admin.seo.index')->with('status', "Saved: {$seo->label}");
     }
