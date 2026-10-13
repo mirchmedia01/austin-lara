@@ -16,9 +16,10 @@ return new class extends Migration
             // contact-us, blog, __global__, or a blog post slug.
             $table->string('page_key')->unique();
             $table->string('label');
-            $table->string('seo_title', 500)->nullable();
-            $table->string('seo_description', 1000)->nullable();
-            $table->string('og_image', 500)->nullable();
+            // No char limits (matches ETCPA's schemaless Mongo SEO): TEXT on MySQL.
+            $table->text('seo_title')->nullable();
+            $table->text('seo_description')->nullable();
+            $table->text('og_image')->nullable();
             $table->timestamps();
         });
     }

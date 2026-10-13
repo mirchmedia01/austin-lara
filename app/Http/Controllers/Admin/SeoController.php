@@ -41,10 +41,11 @@ class SeoController extends Controller
 
     public function update(Request $request, SeoSetting $seo)
     {
+        // No max lengths (matches ETCPA: trim only, Google picks the snippet).
         $data = $request->validate([
-            'seo_title' => ['nullable', 'string', 'max:500'],
-            'seo_description' => ['nullable', 'string', 'max:1000'],
-            'og_image' => ['nullable', 'string', 'max:500'],
+            'seo_title' => ['nullable', 'string'],
+            'seo_description' => ['nullable', 'string'],
+            'og_image' => ['nullable', 'string'],
         ]);
 
         $seo->update($data);
