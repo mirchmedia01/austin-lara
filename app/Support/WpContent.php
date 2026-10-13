@@ -363,6 +363,10 @@ class WpContent
     private function imageTextFromSrc(string $src): string
     {
         $base = basename(explode('?', $src)[0]);
+        // Brand mark — never expose the filename ("Austin Optics Logo White").
+        if (stripos($base, 'logo') !== false && stripos($base, 'austin') !== false) {
+            return 'Austin Optics';
+        }
         $base = preg_replace('/\.(jpe?g|png|webp|gif|svg|avif)$/i', '', $base);
         // Strip WP size/scale suffixes: -300x105, -1024x110, -scaled-2, -150x150.
         $base = preg_replace('/-\d+x\d+$/', '', $base);
