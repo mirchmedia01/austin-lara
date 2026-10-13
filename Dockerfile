@@ -17,7 +17,7 @@ RUN apk add --no-cache \
     npm \
     $PHPIZE_DEPS
 
-# Core extensions
+# Core extensions (incl. MySQL for Railway MySQL service)
 RUN docker-php-ext-configure gd --with-jpeg --with-webp \
     && docker-php-ext-install -j$(nproc) \
         bcmath \
@@ -26,8 +26,10 @@ RUN docker-php-ext-configure gd --with-jpeg --with-webp \
         gd \
         intl \
         mbstring \
+        mysqli \
         pcntl \
         pdo \
+        pdo_mysql \
         xml
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer

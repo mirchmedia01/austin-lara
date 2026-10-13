@@ -79,6 +79,13 @@ class WpContent
 
     public function head(string $page, ?string $seoTitle = null, ?string $seoDescription = null, ?string $ogImage = null): string
     {
+        // DB-driven SEO wins (Railway MySQL seo_settings table), fallback to passed values.
+        try {
+            [$seoTitle, $seoDescription, $ogImage] = Seo::forPage($page, $seoTitle, $seoDescription, $ogImage);
+        } catch (\Throwable) {
+            // fallbacks stand
+        }
+
         $raw = $this->extract($this->source($page), '<head>', '</head>');
         $inner = substr($raw, strlen('<head>'), -strlen('</head>'));
 

@@ -18,6 +18,10 @@ class ForceTrailingSlash
         $path = $request->getPathInfo();
 
         if ($request->isMethod('GET') || $request->isMethod('HEAD')) {
+            // Admin panel keeps standard Laravel URLs (no trailing-slash forcing).
+            if (str_starts_with($path, '/admin')) {
+                return $next($request);
+            }
             if (
                 $path !== '/'
                 && $path !== '/up'

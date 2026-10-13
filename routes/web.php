@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
+use App\Http\Controllers\Admin\SeoController as AdminSeoController;
 use App\Http\Controllers\Blog\BlogController;
 use App\Http\Controllers\Blog\BlogPostController;
 use App\Http\Controllers\LegacyRedirectController;
@@ -27,6 +29,19 @@ use Illuminate\Support\Facades\Route;
 | Austin Optics Web Routes
 |--------------------------------------------------------------------------
 */
+
+// Admin (titles + SEO from MySQL seo_settings table)
+Route::prefix('admin')->name('admin.')->group(function (): void {
+    Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AdminAuthController::class, 'login'])->name('login.store');
+
+    Route::middleware(['isAdmin'])->group(function (): void {
+        Route::post('/logout', [AdminAuthController::class, 'logout'])->name('logout');
+        Route::get('/seo', [AdminSeoController::class, 'index'])->name('seo.index');
+        Route::get('/seo/{seo}', [AdminSeoController::class, 'edit'])->name('seo.edit');
+        Route::put('/seo/{seo}', [AdminSeoController::class, 'update'])->name('seo.update');
+    });
+});
 
 // Home
 Route::get('/', HomeController::class)->name('home');

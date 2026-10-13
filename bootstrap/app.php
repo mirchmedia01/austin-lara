@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+        $middleware->alias([
+            'isAdmin' => \App\Http\Middleware\IsAdmin::class,
+        ]);
         $middleware->web(prepend: [
             \App\Http\Middleware\ForceTrailingSlash::class,
         ]);
