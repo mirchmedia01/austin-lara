@@ -1,4 +1,4 @@
-FROM php:8.4-cli-alpine AS base
+FROM php:8.4.27-cli-alpine AS base
 
 RUN apk add --no-cache \
     bash \
@@ -56,5 +56,8 @@ RUN npm run build \
     && touch database/database.sqlite
 
 EXPOSE 8000
+
+# CVE-2026-109619 interim mitigation (PHP security advisory 2026-10-20)
+RUN printf "session.upload_progress.enabled=0\n" > /usr/local/etc/php/conf.d/zz-upload-progress.ini
 
 CMD ["sh", "-c", "php artisan config:cache && php artisan route:cache && php artisan view:cache && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-8000}"]
